@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#172b3b">
+<title>MyBook — Read, Learn, Grow</title>
+<style>
+:root{--navy:#172b3b;--gold:#c49b54;--paper:#f7f3eb;--ink:#263746;--muted:#75808a;--line:#e6dfd3}
+*{box-sizing:border-box}
+body{margin:0;background:#eee9df;color:var(--ink);font-family:Arial,"Noto Sans Myanmar",sans-serif}
+header{background:linear-gradient(140deg,#172b3b,#29475a);color:white;padding:22px 18px 24px;border-radius:0 0 25px 25px}
+.brand{font-weight:900;letter-spacing:2px;font-size:22px}.tag{color:#e7c98f;font-size:12px;margin-top:5px}
+h1{font-size:27px;margin:20px 0 5px}.sub{color:#e1e8ed;font-size:14px}
+main{max-width:760px;margin:auto;padding:15px}
+.search{width:100%;padding:14px 15px;border:0;border-radius:12px;font-size:16px;margin-top:17px}
+.section-title{font-size:18px;margin:22px 2px 12px}
+.langrow,.mode-row,.tools,.nav{display:flex;gap:8px;flex-wrap:wrap}
+.pill,.btn,.select{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:white;color:var(--ink);font-size:14px}
+.pill.active,.btn.primary{background:var(--navy);color:white;border-color:var(--navy)}
+.book{background:white;border:1px solid #e9e3d8;border-radius:17px;padding:15px;margin:12px 0;box-shadow:0 4px 14px #182b3b0b}
+.cover{height:105px;border-radius:13px;display:grid;place-items:center;font-size:48px;background:linear-gradient(135deg,#e9ddc7,#f7f0e3)}
+.book h3{margin:12px 0 5px;font-size:18px}.muted{color:var(--muted);font-size:13px;line-height:1.55}
+.book .btn{margin-top:12px;width:100%}
+#reader{display:none;margin-top:16px}
+.reader-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.reader-top h2{font-size:18px;margin:0}
+.paper{background:var(--paper);border:1px solid #e5dccb;border-radius:16px;padding:20px 18px;box-shadow:0 8px 25px #24334212;min-height:350px;transform-origin:left center}
+.paper.flip-next{animation:flipNext .36s ease}
+.paper.flip-prev{animation:flipPrev .36s ease}
+@keyframes flipNext{0%{opacity:.25;transform:perspective(900px) rotateY(-9deg) translateX(12px)}100%{opacity:1;transform:perspective(900px) rotateY(0) translateX(0)}}
+@keyframes flipPrev{0%{opacity:.25;transform:perspective(900px) rotateY(9deg) translateX(-12px)}100%{opacity:1;transform:perspective(900px) rotateY(0) translateX(0)}}
+.chapter-kicker{font-size:11px;letter-spacing:1.4px;color:#98763c;font-weight:800;text-transform:uppercase}
+#chapterTitle{font-size:22px;line-height:1.4;margin:9px 0 16px}
+#chapterContent p{font-size:17px;line-height:1.95;margin:0 0 17px;white-space:pre-wrap}
+#chapterContent .translation{border-top:1px solid #ddd2bf;padding-top:15px;margin-top:18px;color:#44515b}
+#chapterContent .translation-label{font-weight:800;color:#98763c;font-size:13px;margin-bottom:8px}
+.reader-select{width:100%;margin:0 0 12px}
+.progress{height:6px;background:#e7e0d4;border-radius:9px;overflow:hidden;margin:12px 0 6px}
+.progress>div{height:100%;width:0;background:var(--gold);transition:width .2s}
+.nav{justify-content:space-between;margin-top:14px}
+.nav .btn{flex:1}
+.tools{margin-top:12px;align-items:center}
+.tools .btn{flex:1}
+.status{font-size:12px;color:#63727c;margin-top:8px;min-height:18px}
+.note{background:#fff8e9;border-left:4px solid var(--gold);padding:11px 12px;border-radius:8px;font-size:12px;line-height:1.6;margin:12px 0}
+#libraryBack{margin-bottom:8px}
+footer{text-align:center;padding:25px;color:#8b8a84;font-size:12px}
+@media(max-width:420px){.paper{padding:17px 15px}#chapterContent p{font-size:16px;line-height:1.9}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand">📚 MYBOOK</div><div class="tag">ENGLISH READING PRACTICE · မြန်မာဘာသာပြန်</div>
+ <h1>Read. Learn. Grow.</h1><div class="sub">နေ့တိုင်း နည်းနည်းဖတ်ပါ။ တဖြည်းဖြည်း တိုးတက်လာပါမယ်။</div>
+ <input class="search" id="search" placeholder="🔎 Search a book..." oninput="renderLibrary()">
+</header>
+<main>
+ <section id="library">
+  <div class="section-title">🌍 Reading language</div>
+  <div class="langrow">
+   <button class="pill active" id="englishMode" onclick="setLanguage('en')">🇬🇧 English</button>
+   <button class="pill" id="myanmarMode" onclick="setLanguage('my')">🇲🇲 မြန်မာ</button>
+  </div>
+  <div class="section-title">📖 Reading style</div>
+  <div class="mode-row">
+   <button class="pill active" id="singleMode" onclick="setReadingMode('single')">English only</button>
+   <button class="pill" id="dualMode" onclick="setReadingMode('dual')">English + မြန်မာ</button>
+  </div>
+  <div class="section-title">✨ My Reading Library</div>
+  <div class="muted">စာအုပ်အားလုံးသည် MyBook အတွက် အသစ်ရေးသားထားသော မူရင်းဖတ်စာများဖြစ်သည်။ တစ်အုပ်စီတွင် Chapter ၆ ခန်း ပါဝင်သည်။</div>
+  <div id="bookCards"></div>
+ </section>
+ <section id="reader">
+  <button class="btn" id="libraryBack" onclick="closeBook()">← စာအုပ်စင်သို့ ပြန်သွားရန်</button>
+  <div class="reader-top"><h2 id="bookTitle"></h2><span class="muted" id="pageCount"></span></div>
+  <select class="select reader-select" id="chapterSelect" onchange="goToChapter(Number(this.value))"></select>
+  <div class="note">📌 Next / Previous ကိုနှိပ်လျှင် စာရွက်လှန်သလို ပြောင်းပါမယ်။ စာမျက်နှာပြောင်းတိုင်း Website အပေါ်ဆုံးကို ပြန်မခုန်တော့ပါ။ ဖတ်နေတဲ့နေရာကို ဒီဖုန်းထဲမှာ မှတ်ထားပေးပါတယ်။</div>
+  <div class="paper" id="paper">
+   <div class="chapter-kicker" id="chapterKicker">MYBOOK ORIGINAL READING</div>
+   <h2 id="chapterTitle"></h2>
+   <div id="chapterContent"></div>
+  </div>
+  <div class="progress"><div id="progressBar"></div></div>
+  <div class="muted" id="progressText"></div>
+  <div class="nav">
+   <button class="btn" onclick="movePage(-1)">← Previous</button>
+   <button class="btn primary" onclick="movePage(1)">Next →</button>
+  </div>
+  <div class="tools">
+   <button class="btn" id="translationToggle" onclick="toggleTranslation()">မြန်မာစာ ဖျောက်ရန်</button>
+   <button class="btn" onclick="markComplete()">✓ ဖတ်ပြီးပြီ</button>
+   <button class="btn" onclick="saveBookmark()">🔖 ဒီနေရာ မှတ်သားရန်</button>
+   <button class="btn" onclick="goToBookmark()">📌 မှတ်သားထားရာ</button>
+   <button class="btn" onclick="changeFont(-1)">A−</button>
+   <button class="btn" onclick="changeFont(1)">A+</button>
+  </div>
+  <div class="status" id="status"></div>
+ </section>
+</main>
+<footer>MYBOOK © 2026 · Original reading practice</footer>
+<script>
+const books = [
+{ id:"quiet-morning", title:"A Quiet Morning in a New City", emoji:"🌅", desc:"A gentle story about starting again, making friends and finding confidence.", chapters:[
+["The First Morning",`Mina woke up before the alarm. For a moment, she did not remember where she was. Then she saw the small window, the blue curtain and the suitcase beside the bed. She was in a new city, far from the street where she had grown up.\n\nOutside, motorbikes passed and shop owners lifted their metal shutters. The sounds were unfamiliar, but they were not frightening. Mina made tea, opened her notebook and wrote three things she wanted to do today: find the bus stop, buy some fruit and speak to one new person.\n\nThe list looked simple. Still, her hands felt a little cold. She took a slow breath and reminded herself that every new place becomes familiar one day at a time.`, `မီနာဟာ နှိုးစက်မမြည်ခင် နိုးလာတယ်။ ခဏလောက် သူဘယ်နေရာမှာရှိနေမှန်း မမှတ်မိဘူး။ ပြီးတော့ ပြတင်းပေါက်လေး၊ အပြာရောင်လိုက်ကာနဲ့ အိပ်ရာဘေးက ခရီးဆောင်အိတ်ကို မြင်လိုက်တယ်။ သူဟာ ကြီးပြင်းခဲ့တဲ့လမ်းကလေးနဲ့ ဝေးတဲ့ မြို့သစ်တစ်မြို့ကို ရောက်နေပြီ။\n\nအပြင်မှာ ဆိုင်ကယ်တွေ ဖြတ်သန်းသွားပြီး ဆိုင်ပိုင်ရှင်တွေက ဆိုင်တံခါးတွေ ဖွင့်နေကြတယ်။ အသံတွေက မရင်းနှီးသေးပေမဲ့ ကြောက်စရာမဟုတ်ဘူး။ မီနာက လက်ဖက်ရည်ဖျော်၊ မှတ်စုစာအုပ်ဖွင့်ပြီး ဒီနေ့လုပ်မယ့်အရာ သုံးခုကို ရေးတယ်။ ဘတ်စ်ကားမှတ်တိုင်ရှာမယ်၊ သစ်သီးဝယ်မယ်၊ လူသစ်တစ်ယောက်နဲ့ စကားပြောမယ်။\n\nစာရင်းက ရိုးရှင်းပေမဲ့ သူ့လက်တွေ အနည်းငယ်အေးနေတယ်။ အသက်ကို ဖြည်းဖြည်းရှူပြီး နေရာသစ်တိုင်းဟာ တစ်နေ့ချင်းစီနဲ့ ရင်းနှီးလာနိုင်တယ်လို့ ကိုယ့်ကိုယ်ကို သတိပေးလိုက်တယ်။`],
+["A Small Wrong Turn",`Mina left the building with a paper map in her pocket. She walked past a bakery, a flower shop and a row of tall trees. At the next crossing, she chose the wrong street. After ten minutes, the buildings looked different from the ones she had seen on the map.\n\nFor a second, she wanted to turn back immediately. Instead, she stopped near a bus shelter and checked the street names. An older woman was waiting there. Mina politely asked for directions. The woman listened carefully and pointed toward a narrow road on the other side.\n\n“Everyone gets lost sometimes,” the woman said with a smile. Mina thanked her and followed the directions. She had not planned to meet anyone, but the mistake had given her a chance to practise speaking.`, `မီနာဟာ စာရွက်မြေပုံလေးကို အိတ်ထဲထည့်ပြီး အဆောက်အအုံကနေ ထွက်လာတယ်။ မုန့်ဆိုင်၊ ပန်းဆိုင်နဲ့ သစ်ပင်မြင့်တန်းတွေကို ဖြတ်လျှောက်ခဲ့တယ်။ လမ်းဆုံတစ်ခုမှာ လမ်းမှားရွေးမိသွားတယ်။ ဆယ်မိနစ်လောက်ကြာတော့ အဆောက်အအုံတွေက မြေပုံထဲကပုံစံနဲ့ မတူတော့ဘူး။\n\nချက်ချင်းပြန်လှည့်ချင်စိတ် ဖြစ်လာပေမဲ့ ဘတ်စ်ကားစောင့်တဲ့နေရာနားမှာ ရပ်ပြီး လမ်းနာမည်တွေကို စစ်ကြည့်တယ်။ အမျိုးသမီးကြီးတစ်ယောက်လည်း အဲဒီမှာ စောင့်နေတယ်။ မီနာက ယဉ်ကျေးစွာ လမ်းမေးလိုက်တယ်။ အမျိုးသမီးကြီးက သေချာနားထောင်ပြီး တစ်ဖက်က လမ်းကျဉ်းလေးကို ညွှန်ပြတယ်။\n\n“လူတိုင်း တစ်ခါတစ်လေ လမ်းပျောက်တတ်ကြတယ်” လို့ ပြုံးပြီး ပြောတယ်။ မီနာက ကျေးဇူးတင်ပြီး လမ်းညွှန်ချက်အတိုင်း သွားခဲ့တယ်။ သူစီစဉ်ထားတာမဟုတ်ပေမဲ့ အဲဒီအမှားက စကားပြောလေ့ကျင့်ဖို့ အခွင့်အရေးတစ်ခု ဖြစ်လာခဲ့တယ်။`],
+["The Fruit Seller",`At the market, Mina stopped in front of a fruit stall. The seller was arranging oranges into a neat pyramid. Mina knew the names of many fruits, but she was not sure how to ask for a good price.\n\nShe tried a sentence she had practised the night before. “Good morning. How much are these oranges?” The seller answered slowly and showed her a small bag. Mina asked whether she could buy half a kilogram. Her pronunciation was not perfect, but the seller understood.\n\nOn the way home, Mina felt proud. She had used English for a real purpose, not just repeated words from a lesson. She wrote the useful phrases in her notebook so she could use them again.`, `ဈေးထဲမှာ မီနာဟာ သစ်သီးဆိုင်ရှေ့မှာ ရပ်လိုက်တယ်။ ဆိုင်ရှင်က လိမ္မော်သီးတွေကို ပိရမစ်ပုံစံ စီနေတယ်။ သစ်သီးနာမည်တွေကို သိပေမဲ့ ဈေးနှုန်းကို ဘယ်လိုမေးရမလဲ မသေချာဘူး။\n\nမနေ့ညက လေ့ကျင့်ထားတဲ့ စာကြောင်းတစ်ကြောင်းကို ကြိုးစားပြောလိုက်တယ်။ “Good morning. How much are these oranges?” ဆိုင်ရှင်က ဖြည်းဖြည်းဖြေပြီး အိတ်လေးတစ်အိတ် ပြတယ်။ မီနာက ကီလိုဝက် ဝယ်လို့ရမလား မေးတယ်။ အသံထွက်က ပြည့်စုံမနေသေးပေမဲ့ ဆိုင်ရှင် နားလည်သွားတယ်။\n\nအိမ်ပြန်လမ်းမှာ မီနာ ဂုဏ်ယူနေမိတယ်။ သင်ခန်းစာထဲက စကားလုံးတွေကို ထပ်ပြောရုံမဟုတ်ဘဲ တကယ့်လိုအပ်ချက်အတွက် အင်္ဂလိပ်စာကို အသုံးပြုနိုင်ခဲ့တယ်။ အသုံးဝင်တဲ့ စကားစုတွေကို နောက်တစ်ခါ ပြန်သုံးနိုင်ဖို့ မှတ်စုစာအုပ်ထဲ ရေးထားလိုက်တယ်။`],
+["A Conversation at the Café",`In the afternoon, Mina visited a small café near her apartment. She ordered tea and sat beside the window. A young man at the next table noticed the notebook beside her cup.\n\n“Are you learning English?” he asked. Mina nodded. She explained that she wanted to speak more confidently at work. The man told her that he was learning Burmese because his grandmother spoke it at home. They laughed when they discovered that both of them were beginners in the other person's language.\n\nThey agreed to practise for ten minutes every Saturday. Mina realised that learning did not always have to happen alone. Sometimes a friendly conversation could become the best classroom.`, `နေ့လယ်ပိုင်းမှာ မီနာဟာ သူ့အိမ်နားက ကော်ဖီဆိုင်လေးကို သွားတယ်။ လက်ဖက်ရည်မှာပြီး ပြတင်းပေါက်နားမှာ ထိုင်တယ်။ ဘေးစားပွဲက လူငယ်တစ်ယောက်က သူ့ခွက်ဘေးက မှတ်စုစာအုပ်ကို သတိထားမိတယ်။\n\n“အင်္ဂလိပ်စာ သင်နေတာလား” လို့ မေးတယ်။ မီနာက ခေါင်းညိတ်ပြီး အလုပ်မှာ ယုံကြည်မှုရှိရှိ စကားပြောချင်လို့ သင်နေတာဖြစ်ကြောင်း ရှင်းပြတယ်။ လူငယ်က သူ့အဖွားဟာ အိမ်မှာ မြန်မာစကားပြောလို့ မြန်မာစာ သင်နေကြောင်း ပြောတယ်။ နှစ်ယောက်စလုံး တစ်ယောက်ရဲ့ဘာသာစကားကို တစ်ယောက်က အစပြုသူတွေဖြစ်နေတာ သိတော့ ရယ်မိကြတယ်။\n\nစနေနေ့တိုင်း ဆယ်မိနစ် လေ့ကျင့်ဖို့ သဘောတူခဲ့ကြတယ်။ သင်ယူခြင်းဟာ တစ်ယောက်တည်း လုပ်ရတာ မဟုတ်ဘူးဆိုတာ မီနာ နားလည်လာတယ်။ တစ်ခါတစ်ရံ ဖော်ရွေတဲ့ စကားဝိုင်းတစ်ခုက အကောင်းဆုံး စာသင်ခန်း ဖြစ်နိုင်တယ်။`],
+["A Better Question",`A week later, Mina could find the market without looking at her map. She also knew the café owner's name and the best time to catch the bus. Her new city had not changed, but her relationship with it had.\n\nOne evening, she made a list of questions she could ask when she met someone: “How long have you lived here?” “What do you recommend?” and “What do you enjoy doing on weekends?” These questions were more useful than memorising a long speech.\n\nMina understood that conversation was not a performance. It was a way to show interest, listen and share a little about herself. She did not need perfect English to begin. She only needed the courage to ask one honest question.`, `တစ်ပတ်ကြာပြီးနောက် မီနာဟာ မြေပုံမကြည့်ဘဲ ဈေးကို သွားတတ်လာတယ်။ ကော်ဖီဆိုင်ပိုင်ရှင်ရဲ့ နာမည်နဲ့ ဘတ်စ်ကားစီးဖို့ အကောင်းဆုံးအချိန်ကိုလည်း သိလာတယ်။ မြို့သစ်က မပြောင်းလဲပေမဲ့ အဲဒီမြို့နဲ့ သူ့ရဲ့ရင်းနှီးမှုက ပြောင်းလဲလာတယ်။\n\nတစ်ညမှာ လူသစ်တစ်ယောက်နဲ့ တွေ့တဲ့အခါ မေးနိုင်မယ့် မေးခွန်းတွေကို ရေးထားတယ်။ “ဒီမှာ နေလာတာ ဘယ်လောက်ကြာပြီလဲ” “ဘာကို အကြံပြုချင်လဲ” “စနေ၊ တနင်္ဂနွေမှာ ဘာလုပ်ရတာ ကြိုက်လဲ” ဆိုတဲ့ မေးခွန်းတွေဟာ မိန့်ခွန်းရှည်တစ်ခု အလွတ်ကျက်တာထက် ပိုအသုံးဝင်တယ်။\n\nစကားပြောခြင်းဟာ ပြိုင်ပွဲတစ်ခု မဟုတ်ဘူး။ စိတ်ဝင်စားမှု ပြသဖို့၊ နားထောင်ဖို့နဲ့ ကိုယ့်အကြောင်း နည်းနည်းမျှဝေဖို့ နည်းလမ်းတစ်ခုပါ။ စတင်ဖို့ အင်္ဂလိပ်စာ ပြည့်စုံနေဖို့ မလိုဘူး။ ရိုးသားတဲ့ မေးခွန်းတစ်ခု မေးရဲတဲ့ သတ္တိပဲ လိုတယ်။`],
+["A Place That Feels Like Home",`On the last Sunday of the month, Mina walked through the park with a small notebook in her bag. She wrote about the people she had met, the words she had learned and the mistakes that had helped her.\n\nShe still missed her old home. Some days were tiring, and some conversations were difficult. But she no longer measured her progress by the number of mistakes she made. She measured it by the things she was willing to try.\n\nBefore going home, Mina bought two oranges from the same seller. He recognised her and greeted her with a smile. The city was slowly becoming a place where people knew her face. Mina looked at the evening sky and felt thankful for the small steps that had brought her there.`, `လကုန်ရဲ့ နောက်ဆုံးတနင်္ဂနွေနေ့မှာ မီနာဟာ အိတ်ထဲမှာ မှတ်စုစာအုပ်လေးထည့်ပြီး ပန်းခြံထဲ လမ်းလျှောက်တယ်။ တွေ့ခဲ့တဲ့လူတွေ၊ သင်ယူခဲ့တဲ့ စကားလုံးတွေနဲ့ သူ့ကို သင်ခန်းစာပေးခဲ့တဲ့ အမှားတွေကို ရေးထားတယ်။\n\nအိမ်ဟောင်းကိုတော့ လွမ်းနေဆဲပါပဲ။ တချို့နေ့တွေမှာ ပင်ပန်းတယ်၊ တချို့စကားဝိုင်းတွေက ခက်ခဲတယ်။ ဒါပေမဲ့ အမှားဘယ်နှစ်ခါလုပ်မိလဲဆိုတာနဲ့ တိုးတက်မှုကို မတိုင်းတာတော့ဘူး။ ကြိုးစားလုပ်ကြည့်ရဲတဲ့ အရာတွေနဲ့ တိုင်းတာလာတယ်။\n\nအိမ်မပြန်ခင် အရင်သစ်သီးဆိုင်ကနေ လိမ္မော်သီးနှစ်လုံး ဝယ်တယ်။ ဆိုင်ရှင်က သူ့ကို မှတ်မိပြီး ပြုံးနှုတ်ဆက်တယ်။ မြို့သစ်ဟာ သူ့မျက်နှာကို သိတဲ့လူတွေရှိတဲ့ နေရာတစ်ခု ဖြစ်လာနေပြီ။ မီနာက ညနေခင်းကောင်းကင်ကို ကြည့်ပြီး ဒီနေရာကို ရောက်လာစေခဲ့တဲ့ ခြေလှမ်းသေးသေးလေးတွေကို ကျေးဇူးတင်နေမိတယ်။`]
+]},
+{ id:"everyday-english", title:"Everyday English at Work", emoji:"☕", desc:"Useful workplace situations, polite questions and clear communication.", chapters:[
+["A Friendly Greeting",`The first few minutes of a workday can shape the mood of the whole shift. A friendly greeting does not need to be long. A smile and a simple “Good morning. How are you today?” can help people feel welcome.\n\nWhen a customer enters, look up and give them time to respond. If they seem busy, keep your greeting brief. If they want to talk, listen carefully and answer in a calm voice. Good service is not about speaking quickly. It is about helping someone feel respected.\n\nPractise saying your greeting aloud three times. Then try it with a friend. Clear, simple English is often more useful than a complicated sentence that is difficult to say.`, `အလုပ်စတဲ့ ပထမမိနစ်အနည်းငယ်က တစ်နေ့လုံးရဲ့ အလုပ်အခြေအနေကို သက်ရောက်စေနိုင်တယ်။ ဖော်ရွေတဲ့ နှုတ်ဆက်စကားဟာ ရှည်ဖို့မလိုဘူး။ ပြုံးပြီး “Good morning. How are you today?” လို့ ပြောရုံနဲ့ လူတွေကို ကြိုဆိုခံရတယ်လို့ ခံစားစေနိုင်တယ်။\n\nဧည့်သည်ဝင်လာရင် မျက်နှာမော့ကြည့်ပြီး ပြန်ဖြေဖို့ အချိန်ပေးပါ။ အလုပ်များနေပုံရရင် နှုတ်ဆက်စကားကို တိုတိုထားပါ။ စကားပြောချင်ရင် သေချာနားထောင်ပြီး တည်ငြိမ်တဲ့အသံနဲ့ ဖြေပါ။ ဝန်ဆောင်မှုကောင်းတယ်ဆိုတာ မြန်မြန်ပြောတာမဟုတ်ဘူး။ တစ်ဖက်လူကို လေးစားခံရတယ်လို့ ခံစားစေတာပါ။\n\nနှုတ်ဆက်စကားကို အသံထွက် သုံးကြိမ်လေ့ကျင့်ပါ။ ပြီးရင် သူငယ်ချင်းတစ်ယောက်နဲ့ စမ်းပြောပါ။ ရိုးရှင်းပြီး ရှင်းလင်းတဲ့ အင်္ဂလိပ်စာဟာ ပြောရခက်တဲ့ စာကြောင်းရှုပ်ရှုပ်ထက် ပိုအသုံးဝင်တတ်တယ်။`],
+["Taking an Order Carefully",`A customer is ready to order, but the restaurant is noisy. Instead of guessing, move a little closer and listen. Repeat the important details: the dish, the quantity and any special request. You can say, “Let me check that: one chicken rice, no onions. Is that correct?”\n\nRepeating an order is not a sign of weak English. It is a professional way to prevent mistakes. If you do not understand a word, ask politely: “Sorry, could you say that again, please?” Most people are happy to repeat themselves when they know you are trying to get the order right.\n\nBefore leaving the table, thank the customer. A careful order saves time for the kitchen and gives the customer confidence.`, `ဧည့်သည်က အစားအသောက်မှာနေတယ်၊ ဒါပေမဲ့ စားသောက်ဆိုင်က ဆူညံနေတယ်။ ခန့်မှန်းပြီး မရေးဘဲ နည်းနည်းနီးကပ်ပြီး သေချာနားထောင်ပါ။ အရေးကြီးတဲ့အချက်တွေဖြစ်တဲ့ ဟင်းအမည်၊ အရေအတွက်နဲ့ အထူးတောင်းဆိုချက်တွေကို ပြန်ပြောအတည်ပြုပါ။ “Let me check that: one chicken rice, no onions. Is that correct?” လို့ ပြောနိုင်တယ်။\n\nအော်ဒါကို ပြန်ပြောတာဟာ အင်္ဂလိပ်စာ အားနည်းတယ်ဆိုတဲ့ အဓိပ္ပာယ် မဟုတ်ဘူး။ အမှားမဖြစ်အောင် ကာကွယ်တဲ့ ပရော်ဖက်ရှင်နယ်နည်းလမ်းပါ။ စကားလုံးတစ်လုံး နားမလည်ရင် “Sorry, could you say that again, please?” လို့ ယဉ်ကျေးစွာ မေးပါ။ မှန်ကန်တဲ့အော်ဒါရဖို့ ကြိုးစားနေတယ်ဆိုတာ သိရင် လူအများစုက ပြန်ပြောပေးတတ်ကြတယ်။\n\nစားပွဲက မထွက်ခင် ဧည့်သည်ကို ကျေးဇူးတင်ပါ။ သေချာတဲ့အော်ဒါက မီးဖိုချောင်အတွက် အချိန်ကုန်သက်သာစေပြီး ဧည့်သည်ကိုလည်း ယုံကြည်မှု ပေးတယ်။`],
+["When You Need Help",`Even experienced workers need help sometimes. Perhaps you cannot find an item, the payment machine is not working or a customer has a question you cannot answer. The best response is to stay calm and explain the situation clearly.\n\nUseful sentences include: “Could you help me with this, please?” “I will check with my supervisor.” and “Thank you for waiting.” These phrases show that you are taking responsibility instead of ignoring the problem.\n\nDo not promise something you are not sure you can do. It is better to say, “Let me confirm that for you,” and return with the correct information. People usually appreciate honesty more than a fast answer that turns out to be wrong.`, `အတွေ့အကြုံရှိတဲ့ ဝန်ထမ်းတွေတောင် တစ်ခါတစ်ရံ အကူအညီလိုတတ်တယ်။ ပစ္စည်းတစ်ခု ရှာမတွေ့တာ၊ ငွေပေးချေစက် အလုပ်မလုပ်တာ၊ မဖြေနိုင်တဲ့ မေးခွန်းတစ်ခုကို ဧည့်သည်က မေးတာမျိုး ဖြစ်နိုင်တယ်။ အကောင်းဆုံးတုံ့ပြန်မှုက စိတ်တည်ငြိမ်အောင်ထားပြီး အခြေအနေကို ရှင်းရှင်းလင်းလင်း ပြောပြတာပါ။\n\nအသုံးဝင်တဲ့ စာကြောင်းတွေက “Could you help me with this, please?” “I will check with my supervisor.” နဲ့ “Thank you for waiting.” တို့ပါ။ ဒီစကားတွေက ပြဿနာကို လျစ်လျူမရှုဘဲ တာဝန်ယူနေတယ်ဆိုတာ ပြသတယ်။\n\nမသေချာတဲ့အရာကို လုပ်ပေးမယ်လို့ ကတိမပေးပါနဲ့။ “Let me confirm that for you” လို့ ပြောပြီး မှန်ကန်တဲ့အချက်အလက်နဲ့ ပြန်လာတာ ပိုကောင်းတယ်။ မှားနေတဲ့ အဖြေကို မြန်မြန်ပေးတာထက် ရိုးသားမှုကို လူတွေက ပိုတန်ဖိုးထားတတ်ကြတယ်။`],
+["Solving a Small Problem",`A customer says that the drink they received is not what they ordered. First, listen without interrupting. Then apologise for the inconvenience and check the order. You might say, “I am sorry about that. Let me check your order and fix it.”\n\nAvoid arguing about who made the mistake. Your first goal is to understand what happened and find a fair solution. If you need permission to replace the drink or change the bill, ask your supervisor before making a promise.\n\nAfter the problem is solved, thank the customer for their patience. A mistake can be disappointing, but a respectful response can rebuild trust. Every difficult moment is also a chance to practise calm communication.`, `ဧည့်သည်က သူရထားတဲ့ သောက်စရာဟာ မှာထားတာနဲ့ မတူဘူးလို့ ပြောတယ်။ ပထမဆုံး ကြားဖြတ်မပြောဘဲ နားထောင်ပါ။ ပြီးရင် အဆင်မပြေမှုအတွက် တောင်းပန်ပြီး အော်ဒါကို စစ်ပါ။ “I am sorry about that. Let me check your order and fix it.” လို့ ပြောနိုင်တယ်။\n\nဘယ်သူမှားလဲဆိုတာ ငြင်းခုံတာကို ရှောင်ပါ။ ပထမရည်မှန်းချက်က ဘာဖြစ်ခဲ့လဲ နားလည်ဖို့နဲ့ မျှတတဲ့ဖြေရှင်းနည်း ရှာဖို့ပါ။ သောက်စရာအစားထိုးဖို့ ဒါမှမဟုတ် ဘေလ်ပြင်ဖို့ ခွင့်ပြုချက်လိုရင် ကတိမပေးခင် ကြီးကြပ်သူကို မေးပါ။\n\nပြဿနာဖြေရှင်းပြီးတဲ့အခါ စိတ်ရှည်ပေးတဲ့အတွက် ဧည့်သည်ကို ကျေးဇူးတင်ပါ။ အမှားတစ်ခုက စိတ်ပျက်စေနိုင်ပေမဲ့ လေးစားစွာ တုံ့ပြန်ခြင်းက ယုံကြည်မှုကို ပြန်တည်ဆောက်နိုင်တယ်။ ခက်ခဲတဲ့အချိန်တိုင်းဟာ တည်ငြိမ်တဲ့ ဆက်သွယ်ရေးကို လေ့ကျင့်ဖို့ အခွင့်အရေးပါ။`],
+["A Busy Shift",`During a busy shift, several things may happen at once. The phone rings, a new table arrives and the kitchen asks about an order. Trying to do everything immediately can make you feel confused.\n\nTake one second to decide what is most urgent. A customer waiting to pay may need attention before a task that can wait. If another worker is free, ask for help clearly: “Could you take this table while I check the order?”\n\nAt the end of the shift, think about one thing that went well and one thing you can improve. This short reflection helps you learn from real experience. You do not need to be perfect during a busy day. You need to stay organised, communicate and keep going.`, `အလုပ်များတဲ့အချိန်မှာ အရာများစွာ တစ်ပြိုင်နက် ဖြစ်လာနိုင်တယ်။ ဖုန်းမြည်တယ်၊ စားပွဲအသစ်ရောက်တယ်၊ မီးဖိုချောင်က အော်ဒါအကြောင်း မေးတယ်။ အရာအားလုံးကို ချက်ချင်းလုပ်ဖို့ ကြိုးစားရင် စိတ်ရှုပ်ထွေးနိုင်တယ်။\n\nအရေးအကြီးဆုံးအရာကို ဆုံးဖြတ်ဖို့ တစ်စက္ကန့်လောက် အချိန်ယူပါ။ ငွေရှင်းဖို့ စောင့်နေတဲ့ ဧည့်သည်က စောင့်နိုင်တဲ့အလုပ်ထက် ပိုအရေးကြီးနိုင်တယ်။ တခြားဝန်ထမ်းတစ်ယောက် အားနေရင် “Could you take this table while I check the order?” လို့ ရှင်းရှင်းလင်းလင်း အကူအညီတောင်းပါ။\n\nအလုပ်ချိန်ပြီးတဲ့အခါ ကောင်းကောင်းလုပ်နိုင်ခဲ့တဲ့အရာတစ်ခုနဲ့ တိုးတက်အောင်လုပ်နိုင်တဲ့အရာတစ်ခုကို စဉ်းစားပါ။ ဒီလိုတိုတောင်းတဲ့ ပြန်လည်သုံးသပ်မှုက တကယ့်အတွေ့အကြုံကနေ သင်ယူစေတယ်။ အလုပ်များတဲ့နေ့မှာ ပြည့်စုံနေဖို့ မလိုပါဘူး။ စနစ်တကျလုပ်ဖို့၊ ဆက်သွယ်ဖို့နဲ့ ဆက်ကြိုးစားဖို့ပဲ လိုတယ်။`],
+["Growing Through Practice",`After several weeks, the phrases that once felt difficult begin to come naturally. You recognise common questions and understand more of the answers. You may still make mistakes, but you recover more quickly.\n\nKeep a small list of expressions you used at work. At home, read them aloud and create one new example for each phrase. For example, after learning “Would you like…?”, practise asking about tea, dessert or a takeaway bag.\n\nLanguage grows through use. Ten minutes of focused practice every day can be more helpful than studying for two hours once a month. Be patient with yourself and notice every improvement, even a small one.`, `ရက်သတ္တပတ်အနည်းငယ်ကြာလာတဲ့အခါ အရင်က ခက်ခဲတယ်လို့ ခံစားရတဲ့ စကားစုတွေက သဘာဝကျကျ ပြောတတ်လာတယ်။ မကြာခဏ မေးလေ့ရှိတဲ့ မေးခွန်းတွေကို မှတ်မိလာပြီး အဖြေတွေကိုလည်း ပိုနားလည်လာတယ်။ အမှားတွေ ရှိနေသေးပေမဲ့ ပိုမြန်မြန် ပြန်ပြင်နိုင်လာတယ်။\n\nအလုပ်မှာ သုံးခဲ့တဲ့ စကားစုလေးတွေကို စာရင်းလုပ်ထားပါ။ အိမ်မှာ အသံထွက်ဖတ်ပြီး စကားစုတစ်ခုစီအတွက် ဥပမာအသစ်တစ်ခု ဖန်တီးပါ။ ဥပမာ “Would you like…?” ကို သင်ယူပြီးရင် လက်ဖက်ရည်၊ အချိုပွဲ ဒါမှမဟုတ် ပါဆယ်အိတ် လိုချင်မလား မေးတာကို လေ့ကျင့်ပါ။\n\nဘာသာစကားဟာ အသုံးပြုခြင်းကနေ တိုးတက်လာတယ်။ တစ်လမှာ တစ်ကြိမ် နှစ်နာရီလေ့လာတာထက် နေ့တိုင်း ဆယ်မိနစ် အာရုံစိုက်လေ့ကျင့်တာက ပိုအကျိုးရှိနိုင်တယ်။ ကိုယ့်ကိုယ်ကို စိတ်ရှည်ပါ။ တိုးတက်မှုသေးသေးလေးတိုင်းကို သတိထားပါ။`]
+]},
+{ id:"stronger-days", title:"Small Steps, Stronger Days", emoji:"🌱", desc:"An original guide to habits, focus, confidence and steady progress.", chapters:[
+["Begin with One Small Step",`People often wait for the perfect moment to begin. They want more time, more energy or a better plan. But the perfect moment rarely arrives. A useful beginning is usually much smaller than we imagine.\n\nIf you want to read more, begin with two pages. If you want to become stronger, take a short walk. If you want to learn a language, practise five useful sentences. Small actions are easier to repeat, and repetition helps them become part of daily life.\n\nChoose one action that is so simple you can do it even on a busy day. Write down when and where you will do it. Your first goal is not to change your whole life today. It is to prove to yourself that you can begin.`, `လူတွေဟာ စတင်ဖို့ ပြည့်စုံတဲ့အချိန်ကို မကြာခဏ စောင့်တတ်ကြတယ်။ အချိန်ပိုလိုတယ်၊ အားအင်ပိုလိုတယ်၊ ပိုကောင်းတဲ့အစီအစဉ်လိုတယ်လို့ ထင်ကြတယ်။ ဒါပေမဲ့ ပြည့်စုံတဲ့အချိန်ဆိုတာ ရောက်လာခဲတယ်။ အသုံးဝင်တဲ့အစတစ်ခုဟာ ကိုယ်ထင်ထားတာထက် အများကြီး သေးငယ်တတ်တယ်။\n\nစာပိုဖတ်ချင်ရင် နှစ်မျက်နှာကနေ စပါ။ ကိုယ်ခန္ဓာသန်မာချင်ရင် လမ်းတိုတိုလျှောက်ပါ။ ဘာသာစကားသင်ချင်ရင် အသုံးဝင်တဲ့ စာကြောင်းငါးကြောင်း လေ့ကျင့်ပါ။ သေးငယ်တဲ့လုပ်ဆောင်ချက်တွေကို ထပ်လုပ်ဖို့ ပိုလွယ်ပြီး ထပ်ခါထပ်ခါလုပ်ခြင်းက နေ့စဉ်ဘဝရဲ့ အစိတ်အပိုင်း ဖြစ်လာစေတယ်။\n\nအလုပ်များတဲ့နေ့မှာတောင် လုပ်နိုင်လောက်အောင် ရိုးရှင်းတဲ့အရာတစ်ခုကို ရွေးပါ။ ဘယ်အချိန်၊ ဘယ်နေရာမှာ လုပ်မလဲ ရေးထားပါ။ ဒီနေ့ရဲ့ ပထမရည်မှန်းချက်က ဘဝတစ်ခုလုံး ပြောင်းလဲဖို့ မဟုတ်ဘူး။ စတင်နိုင်တယ်ဆိုတာ ကိုယ့်ကိုယ်ကို သက်သေပြဖို့ပါ။`],
+["Make Your Environment Helpful",`Willpower is useful, but it becomes tired when you must use it for every decision. Your environment can make good choices easier. Put your book where you can see it. Prepare your walking shoes near the door. Keep your study notes on the table instead of hiding them in a drawer.\n\nYou can also make distractions less convenient. Put your phone away for a short reading session. Turn off notifications while you practise. You do not need to remove every distraction from your life; you only need to create a little space for the activity that matters.\n\nLook around your room today. Change one small thing so that the habit you want becomes easier to start.`, `စိတ်အားထက်သန်မှုက အသုံးဝင်ပေမဲ့ ဆုံးဖြတ်ချက်တိုင်းအတွက် အသုံးပြုနေရင် ပင်ပန်းလာတတ်တယ်။ ကိုယ့်ပတ်ဝန်းကျင်က ကောင်းမွန်တဲ့ရွေးချယ်မှုတွေကို ပိုလွယ်ကူစေနိုင်တယ်။ စာအုပ်ကို မြင်သာတဲ့နေရာမှာ ထားပါ။ လမ်းလျှောက်ဖိနပ်ကို တံခါးနားမှာ ပြင်ထားပါ။ လေ့လာရေးမှတ်စုတွေကို အံဆွဲထဲ ဖွက်မထားဘဲ စားပွဲပေါ်မှာ ထားပါ။\n\nအာရုံပျံ့လွင့်စရာတွေကိုလည်း အဆင်မပြေသလို လုပ်ထားနိုင်တယ်။ စာဖတ်ချိန်တိုလေးမှာ ဖုန်းကို ဝေးဝေးထားပါ။ လေ့ကျင့်နေချိန် အသိပေးချက်တွေ ပိတ်ထားပါ။ အာရုံပျံ့လွင့်စရာအားလုံးကို ဖယ်ရှားဖို့ မလိုပါဘူး။ အရေးကြီးတဲ့အလုပ်အတွက် နေရာနည်းနည်း ဖန်တီးဖို့ပဲ လိုတယ်။\n\nဒီနေ့ ကိုယ့်အခန်းကို ကြည့်ပါ။ ကိုယ်လိုချင်တဲ့ အကျင့်ကို စတင်ရလွယ်စေမယ့် အပြောင်းအလဲသေးသေးလေးတစ်ခု လုပ်ပါ။`],
+["Focus on the Next Ten Minutes",`A large goal can feel heavy because it asks us to imagine weeks or months of effort. The next ten minutes are easier to understand. During those minutes, you can read one section, review a few words or finish one small task.\n\nBefore you begin, decide what “finished” means. Put away anything unrelated and give the task your attention. If a new thought appears, write it down and return to what you were doing. This keeps a small interruption from becoming a long delay.\n\nWhen the ten minutes are over, you may stop or continue. Either choice is useful. You have already kept a promise to yourself, and that is a strong foundation for building focus.`, `ရည်မှန်းချက်ကြီးတစ်ခုဟာ ရက်သတ္တပတ်တွေ၊ လတွေကြာအောင် ကြိုးစားရမယ်လို့ စဉ်းစားရတဲ့အတွက် လေးလံသလို ခံစားရနိုင်တယ်။ နောက်လာမယ့် ဆယ်မိနစ်ကိုတော့ နားလည်ရ ပိုလွယ်တယ်။ အဲဒီအချိန်အတွင်း စာပိုဒ်တစ်ပိုဒ်ဖတ်နိုင်တယ်၊ စကားလုံးအနည်းငယ် ပြန်လေ့လာနိုင်တယ်၊ အလုပ်သေးသေးလေးတစ်ခု ပြီးအောင်လုပ်နိုင်တယ်။\n\nမစခင် ဘယ်အချိန်မှာ ပြီးပြီလို့ သတ်မှတ်မလဲ ဆုံးဖြတ်ပါ။ မသက်ဆိုင်တဲ့အရာတွေကို ဖယ်ပြီး အလုပ်ကို အာရုံစိုက်ပါ။ အတွေးအသစ်တစ်ခု ပေါ်လာရင် ရေးမှတ်ထားပြီး လုပ်နေတဲ့အရာဆီ ပြန်လာပါ။ ဒါက အနှောင့်အယှက်သေးသေးလေးကို ကြန့်ကြာမှုကြီး ဖြစ်မသွားအောင် ကာကွယ်ပေးတယ်။\n\nဆယ်မိနစ်ပြည့်ရင် ရပ်နိုင်သလို ဆက်လုပ်လည်းရတယ်။ နှစ်မျိုးစလုံး အကျိုးရှိတယ်။ ကိုယ့်ကိုယ်ကို ပေးထားတဲ့ ကတိတစ်ခုကို တည်နိုင်ခဲ့ပြီ။ အဲဒါဟာ အာရုံစူးစိုက်မှု တည်ဆောက်ဖို့ ခိုင်မာတဲ့အခြေခံပါ။`],
+["Learn from an Imperfect Day",`Some days will not go according to plan. You may feel tired, become busy or forget the habit you wanted to practise. It is easy to turn one missed day into a reason to give up completely.\n\nInstead, ask a kinder question: “What made this difficult today?” Perhaps the plan was too long, the time was not realistic or you needed rest. Use the answer to adjust your plan. A smaller habit that fits your real life is better than a perfect routine that you cannot maintain.\n\nStart again at the next opportunity. Progress is not the absence of difficult days. It is the decision to return after them.`, `တချို့နေ့တွေမှာ အစီအစဉ်အတိုင်း ဖြစ်မလာနိုင်ဘူး။ ပင်ပန်းနေနိုင်တယ်၊ အလုပ်များနေနိုင်တယ်၊ လေ့ကျင့်ချင်တဲ့အကျင့်ကို မေ့သွားနိုင်တယ်။ တစ်ရက်လွတ်သွားတာကို အကြောင်းပြုပြီး လုံးဝလက်လျှော့ချင်စိတ် ဖြစ်လွယ်တယ်။\n\nအဲဒီအစား ကိုယ့်ကိုယ်ကို ပိုကြင်နာတဲ့ မေးခွန်းတစ်ခု မေးပါ။ “ဒီနေ့ ဘာကြောင့် ခက်ခဲခဲ့တာလဲ” အစီအစဉ်က ရှည်လွန်းတာလား၊ အချိန်က လက်တွေ့မကျတာလား၊ အနားယူဖို့ လိုနေတာလား။ အဖြေကို အသုံးပြုပြီး အစီအစဉ်ကို ပြင်ဆင်ပါ။ ကိုယ့်ဘဝနဲ့ ကိုက်ညီတဲ့ အကျင့်သေးသေးလေးဟာ ဆက်မထိန်းနိုင်တဲ့ ပြည့်စုံလွန်းတဲ့ လုပ်ရိုးလုပ်စဉ်ထက် ပိုကောင်းတယ်။\n\nနောက်ထပ်အခွင့်အရေးရတာနဲ့ ပြန်စပါ။ တိုးတက်မှုဆိုတာ ခက်ခဲတဲ့နေ့တွေ မရှိခြင်းမဟုတ်ဘူး။ အဲဒီနေ့တွေပြီးနောက် ပြန်စတင်ဖို့ ဆုံးဖြတ်နိုင်ခြင်းပါ။`],
+["Notice the Progress You Make",`People often notice what is still missing and forget to recognise what has improved. You may understand a paragraph today that was difficult last month. You may speak to a customer with less fear. These are real signs of progress.\n\nKeep a simple record. At the end of each day, write one thing you learned, one thing you tried and one thing you want to practise tomorrow. Do not compare your page with another person's page. Everyone begins with different experiences and different responsibilities.\n\nAfter a few weeks, read your notes again. You may discover that many small efforts have created a change you could not see day by day. Give yourself credit for continuing.`, `လူတွေဟာ မရသေးတဲ့အရာတွေကိုပဲ သတိထားပြီး တိုးတက်လာတဲ့အရာတွေကို အသိအမှတ်ပြုဖို့ မေ့တတ်ကြတယ်။ ပြီးခဲ့တဲ့လက ခက်ခဲခဲ့တဲ့ စာပိုဒ်တစ်ပိုဒ်ကို ဒီနေ့ နားလည်လာနိုင်တယ်။ ဧည့်သည်နဲ့ စကားပြောတဲ့အခါ အရင်ထက် ကြောက်စိတ်နည်းလာနိုင်တယ်။ ဒါတွေဟာ တကယ့်တိုးတက်မှု လက္ခဏာတွေပါ။\n\nရိုးရှင်းတဲ့ မှတ်တမ်းတစ်ခု ထားပါ။ နေ့ကုန်တိုင်း သင်ယူခဲ့တာတစ်ခု၊ ကြိုးစားခဲ့တာတစ်ခုနဲ့ မနက်ဖြန် လေ့ကျင့်ချင်တာတစ်ခုကို ရေးပါ။ ကိုယ့်စာမျက်နှာကို တခြားသူရဲ့စာမျက်နှာနဲ့ မနှိုင်းယှဉ်ပါနဲ့။ လူတိုင်းမှာ စတင်ခဲ့တဲ့အတွေ့အကြုံနဲ့ တာဝန်တွေ မတူကြဘူး။\n\nရက်သတ္တပတ်အနည်းငယ်ကြာပြီးရင် မှတ်စုတွေကို ပြန်ဖတ်ပါ။ နေ့စဉ်ကြည့်ရုံနဲ့ မမြင်နိုင်ခဲ့တဲ့ ပြောင်းလဲမှုတစ်ခုကို ကြိုးစားမှုသေးသေးလေးတွေက ဖန်တီးပေးခဲ့တာကို တွေ့လာနိုင်တယ်။ ဆက်ကြိုးစားနေတဲ့ ကိုယ့်ကိုယ်ကို အသိအမှတ်ပြုပါ။`],
+["Make Learning Part of Your Life",`Learning becomes more powerful when it connects with ordinary life. Read a short story on the bus. Listen carefully when someone explains a new task. Use a new English phrase when you order food or greet a colleague. Real situations help words become meaningful.\n\nYou do not need to understand every word to enjoy a text. First, read for the main idea. Then choose three unfamiliar words and try to guess their meaning from the sentence. Check them afterwards and write one example of your own.\n\nKeep learning curious and practical. The goal is not to finish a book as quickly as possible. The goal is to understand a little more and use what you learn in your own life.`, `သင်ယူခြင်းဟာ နေ့စဉ်ဘဝနဲ့ ဆက်စပ်လာတဲ့အခါ ပိုအားကောင်းလာတယ်။ ဘတ်စ်ကားပေါ်မှာ ပုံပြင်တိုလေး ဖတ်ပါ။ အလုပ်အသစ်တစ်ခုကို ရှင်းပြတဲ့အခါ သေချာနားထောင်ပါ။ အစားအသောက်မှာတဲ့အခါ ဒါမှမဟုတ် လုပ်ဖော်ကိုင်ဖက်ကို နှုတ်ဆက်တဲ့အခါ အင်္ဂလိပ်စကားစုအသစ်တစ်ခု သုံးကြည့်ပါ။ တကယ့်အခြေအနေတွေက စကားလုံးတွေကို အဓိပ္ပာယ်ရှိလာစေတယ်။\n\nစာတစ်ပုဒ်ကို နှစ်သက်ဖို့ စကားလုံးတိုင်း နားလည်ဖို့ မလိုပါဘူး။ ပထမဆုံး အဓိကအကြောင်းအရာကို ဖတ်ပါ။ ပြီးရင် မသိတဲ့စကားလုံး သုံးလုံးရွေးပြီး စာကြောင်းထဲကနေ အဓိပ္ပာယ် ခန့်မှန်းကြည့်ပါ။ နောက်မှ စစ်ဆေးပြီး ကိုယ်ပိုင်ဥပမာတစ်ခု ရေးပါ။\n\nသင်ယူမှုကို စူးစမ်းလိုစိတ်ရှိပြီး လက်တွေ့ကျအောင် ထားပါ။ ရည်မှန်းချက်က စာအုပ်တစ်အုပ်ကို အမြန်ဆုံးပြီးဖို့ မဟုတ်ဘူး။ နည်းနည်းပိုနားလည်လာဖို့နဲ့ သင်ယူထားတာကို ကိုယ့်ဘဝမှာ အသုံးချဖို့ပါ။`]
+]}
+];
+
+let currentBook=0,currentChapter=0,language="en",readingMode="dual",fontSize=17,translationVisible=true;
+function escapeHtml(s){return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")}
+function renderLibrary(){
+ const q=document.getElementById("search").value.toLowerCase();
+ document.getElementById("bookCards").innerHTML=books.map((b,i)=>({b,i})).filter(x=>(x.b.title+" "+x.b.desc).toLowerCase().includes(q)).map(({b,i})=>`
+ <article class="book"><div class="cover">${b.emoji}</div><h3>${b.title}</h3><div class="muted">${b.desc}</div><div class="muted">📘 ${b.chapters.length} Chapters · Original reading material</div><button class="btn primary" onclick="openBook(${i})">စာဖတ်ရန် / Read book →</button></article>`).join("");
+}
+function setLanguage(v){
+ language=v;
+ document.getElementById("englishMode").classList.toggle("active",v==="en");
+ document.getElementById("myanmarMode").classList.toggle("active",v==="my");
+ if(document.getElementById("reader").style.display==="block")renderPage(false);
+}
+function setReadingMode(v){
+ readingMode=v;translationVisible=true;
+ document.getElementById("singleMode").classList.toggle("active",v==="single");
+ document.getElementById("dualMode").classList.toggle("active",v==="dual");
+ if(document.getElementById("reader").style.display==="block")renderPage(false);
+}
+function progressKey(){return "mybook-progress-"+books[currentBook].id}
+function readSet(){try{return JSON.parse(localStorage.getItem(progressKey())||"[]")}catch(e){return []}}
+function openBook(i){
+ currentBook=i;translationVisible=true;
+ const saved=localStorage.getItem("mybook-last-"+books[i].id);
+ currentChapter=saved===null?0:Math.min(Number(saved),books[i].chapters.length-1);
+ document.getElementById("library").style.display="none";
+ document.getElementById("reader").style.display="block";
+ document.getElementById("bookTitle").textContent=books[i].title;
+ const sel=document.getElementById("chapterSelect");
+ sel.innerHTML=books[i].chapters.map((c,n)=>`<option value="${n}">Chapter ${n+1}: ${c[0]}</option>`).join("");
+ renderPage(false);
+}
+function closeBook(){
+ localStorage.setItem("mybook-last-"+books[currentBook].id,String(currentChapter));
+ document.getElementById("reader").style.display="none";
+ document.getElementById("library").style.display="block";
+}
+function renderPage(animate){
+ const b=books[currentBook],c=b.chapters[currentChapter],paper=document.getElementById("paper");
+ if(animate){paper.classList.remove("flip-next","flip-prev");void paper.offsetWidth;paper.classList.add(animate>0?"flip-next":"flip-prev");}
+ document.getElementById("chapterKicker").textContent=`${b.title.toUpperCase()} · CHAPTER ${currentChapter+1}`;
+ document.getElementById("chapterTitle").textContent=c[0];
+ let content="";
+ if(language==="my"){
+   content=`<div class="translation"><div class="translation-label">🇲🇲 မြန်မာဘာသာ</div><p>${escapeHtml(c[2])}</p></div>`;
+ } else {
+   const enParts=c[1].split(/\n\s*\n/).filter(Boolean);
+   const myParts=c[2].split(/\n\s*\n/).filter(Boolean);
+   content=enParts.map((part,index)=>{
+     const translation=(readingMode==="dual" && myParts[index])
+       ? `<div class="translation paragraph-translation"><div class="translation-label">🇲🇲 မြန်မာဘာသာပြန်</div><p>${escapeHtml(myParts[index])}</p></div>`
+       : "";
+     return `<p>${escapeHtml(part)}</p>${translation}`;
+   }).join("");
+ }
+ document.getElementById("chapterContent").innerHTML=content;
+ document.getElementById("translationToggle").style.display=language==="en" && readingMode==="dual"?"inline-block":"none";
+ document.getElementById("translationToggle").textContent=translationVisible?"မြန်မာစာ ဖျောက်ရန်":"မြန်မာစာ ပြရန်";
+ document.querySelectorAll(".paragraph-translation").forEach(el=>el.style.display=translationVisible?"block":"none");
+ document.getElementById("chapterSelect").value=String(currentChapter);
+ document.getElementById("pageCount").textContent=`${currentChapter+1} / ${b.chapters.length}`;
+ document.getElementById("progressText").textContent=`ဖတ်ပြီးသော Chapter ${readSet().length} / ${b.chapters.length}`;
+ document.getElementById("progressBar").style.width=(readSet().length/b.chapters.length*100)+"%";
+ document.getElementById("chapterContent").style.setProperty("--reader-font",fontSize+"px");
+ document.querySelectorAll("#chapterContent p").forEach(p=>p.style.fontSize=fontSize+"px");
+ localStorage.setItem("mybook-last-"+b.id,String(currentChapter));
+}
+function goToChapter(n){currentChapter=Math.max(0,Math.min(n,books[currentBook].chapters.length-1));renderPage(true)}
+function movePage(direction){
+ const next=currentChapter+direction;
+ if(next<0||next>=books[currentBook].chapters.length){document.getElementById("status").textContent=direction>0?"ဒီစာအုပ်ရဲ့ နောက်ဆုံး Chapter ကို ရောက်ပါပြီ။":"ပထမဆုံး Chapter ဖြစ်ပါတယ်။";return;}
+ currentChapter=next;renderPage(direction);
+}
+function toggleTranslation(){
+ translationVisible=!translationVisible;
+ document.querySelectorAll(".paragraph-translation").forEach(el=>el.style.display=translationVisible?"block":"none");
+ document.getElementById("translationToggle").textContent=translationVisible?"မြန်မာစာ ဖျောက်ရန်":"မြန်မာစာ ပြရန်";
+}
+function markComplete(){
+ const done=readSet();if(!done.includes(currentChapter))done.push(currentChapter);
+ localStorage.setItem(progressKey(),JSON.stringify(done));renderPage(false);
+ document.getElementById("status").textContent="✓ ဒီ Chapter ကို ဖတ်ပြီးကြောင်း သိမ်းပြီးပါပြီ။";
+}
+function saveBookmark(){
+ const bookmark={book:currentBook,chapter:currentChapter,bookTitle:books[currentBook].title,chapterTitle:books[currentBook].chapters[currentChapter][0]};
+ try{
+   localStorage.setItem("mybook-bookmark",JSON.stringify(bookmark));
+   document.getElementById("status").textContent=`🔖 မှတ်သားပြီးပါပြီ — ${bookmark.bookTitle} / Chapter ${bookmark.chapter+1}။ ပြန်ဖွင့်ရန် “မှတ်သားထားရာ” ကိုနှိပ်ပါ။`;
+ }catch(e){
+   document.getElementById("status").textContent="မှတ်သားလို့မရပါ။ Safari Settings ထဲက Website Data ကို ပိတ်ထားခြင်းရှိမရှိ စစ်ကြည့်ပါ။";
+ }
+}
+function goToBookmark(){
+ const raw=localStorage.getItem("mybook-bookmark");
+ if(!raw){
+   document.getElementById("status").textContent="မှတ်သားထားတဲ့နေရာ မရှိသေးပါ။ အရင်ဆုံး “ဒီနေရာ မှတ်သားရန်” ကိုနှိပ်ပါ။";
+   return;
+ }
+ try{
+   const saved=JSON.parse(raw);
+   if(!Number.isInteger(saved.book)||!Number.isInteger(saved.chapter)||!books[saved.book]||!books[saved.book].chapters[saved.chapter]){
+     document.getElementById("status").textContent="သိမ်းထားတဲ့နေရာကို ဖတ်မရပါ။ ဒီနေရာကို အသစ်ပြန်မှတ်သားပါ။";
+     return;
+   }
+   currentBook=saved.book;
+   currentChapter=saved.chapter;
+   document.getElementById("library").style.display="none";
+   document.getElementById("reader").style.display="block";
+   document.getElementById("bookTitle").textContent=books[currentBook].title;
+   const sel=document.getElementById("chapterSelect");
+   sel.innerHTML=books[currentBook].chapters.map((c,n)=>`<option value="${n}">Chapter ${n+1}: ${c[0]}</option>`).join("");
+   renderPage(false);
+   document.getElementById("status").textContent=`📌 မှတ်သားထားတဲ့နေရာ — ${books[currentBook].title} / Chapter ${currentChapter+1}`;
+ }catch(e){
+   document.getElementById("status").textContent="မှတ်သားထားတဲ့နေရာကို ဖတ်မရပါ။ ဒီနေရာကို အသစ်ပြန်မှတ်သားပါ။";
+ }
+}
+function changeFont(d){
+ fontSize=Math.max(14,Math.min(23,fontSize+d));
+ document.querySelectorAll("#chapterContent p").forEach(p=>p.style.fontSize=fontSize+"px");
+}
+let touchX=0;
+document.getElementById("paper").addEventListener("touchstart",e=>{touchX=e.changedTouches[0].screenX},{passive:true});
+document.getElementById("paper").addEventListener("touchend",e=>{
+ const dx=e.changedTouches[0].screenX-touchX;
+ if(Math.abs(dx)>65)movePage(dx<0?1:-1);
+},{passive:true});
+renderLibrary();
+</script>
+</body>
+</html>
